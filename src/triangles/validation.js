@@ -18,12 +18,12 @@ const validateSide = (side, lowerBound, upperBound) =>
       };
 
 const validateTriangle = (sides, lowerBound, upperBound) => {
-  const validationResults = sides.map((side) =>
-    validateSide(side, lowerBound, upperBound)
-  );
+  const validationResults = sides
+    .map((side) => validateSide(side, lowerBound, upperBound))
+    .filter((validationResult) => validationResult.isValid === false);
 
   return {
-    isValid: !validationResults.some((result) => result.isValid === false),
+    isValid: validationResults.length === 0,
     errorMessages: validationResults.map((result) => result.errorMessage),
   };
 };

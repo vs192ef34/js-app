@@ -10,10 +10,32 @@
     <title>Task Manager</title>
   </head>
   <body>
+    <form action="#" name="newTriangle" id="new-triangle">
+      <fieldset name="side1">
+        <input type="text" name="side1name" id="side1name" />
+        <input type="text" name="side1value" id="side1value" />
+      </fieldset>
+
+      <fieldset name="side2">
+        <input type="text" name="side2name" id="side2name" />
+        <input type="text" name="side2value" id="side2value" />
+      </fieldset>
+
+      <fieldset name="side3">
+        <input type="text" name="side3name" id="side3name" />
+        <input type="text" name="side3value" id="side3value" />
+      </fieldset>
+
+      <fieldset name="controls">
+        <input type="button" value="Check" />
+      </fieldset>
+    </form>
+
     <!-- main application block -->
     <div id="app">
       <noscript> Please, turn your JavaScript on. </noscript>
     </div>
+
     <!-- main script block -->
     <script async type="module">
       import { main } from "./src/main.js";

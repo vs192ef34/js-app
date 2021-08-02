@@ -5,17 +5,15 @@ import { isTriangle } from "./triangles/geometry.js";
 import { getAnswerPhrase } from "./triangles/output.js";
 
 const sides = [
-  { sideName: "a", sideLength: 300 },
-  { sideName: "b", sideLength: 400 },
-  { sideName: "c", sideLength: 500 },
+  { sideName: "a", sideLength: 3000 },
+  { sideName: "b", sideLength: 4000 },
+  { sideName: "c", sideLength: 5000 },
 ];
 
 const lowerBound = 0;
 const upperBound = 1000;
 
-function renderErrorScreen(messages, helpText) {
-  const fragment = new DocumentFragment();
-
+function renderErrorList(messages) {
   const errorListElement = document.createElement("ul");
 
   messages.forEach((message) => {
@@ -25,11 +23,21 @@ function renderErrorScreen(messages, helpText) {
     errorListElement.append(messageItem);
   });
 
+  return errorListElement;
+}
+
+function renderHelpText(helpText) {
   const helpTextElement = document.createElement("p");
   helpTextElement.innerHTML = helpText;
 
-  fragment.append(errorListElement);
-  fragment.append(helpTextElement);
+  return helpTextElement;
+}
+
+function renderErrorScreen(messages, helpText) {
+  const fragment = new DocumentFragment();
+
+  fragment.append(renderErrorList(messages));
+  fragment.append(renderHelpText(helpText));
 
   return fragment;
 }
@@ -37,38 +45,54 @@ function renderErrorScreen(messages, helpText) {
 function renderAnswerScreen(answerPhrase, answer) {
   const answerElement = document.createElement("p");
   answerElement.innerHTML = answerPhrase;
-  answerElement.style.color = answer ? "green" : "red";
 
   return answerElement;
 }
 
+function renderNonvalidResult(appRoot, messages) {
+  appRoot.classList.add("error-box");
+
+  appRoot.append(
+    renderErrorScreen(messages, getHelpText(lowerBound, upperBound))
+  );
+}
+
+function renderValidResult(appRoot, isTriangle) {
+  const boxClassName = isTriangle ? "info-box" : "warning-box";
+  appRoot.classList.add(boxClassName);
+
+  appRoot.append(
+    renderAnswerScreen(getAnswerPhrase(sides, isTriangle), isTriangle)
+  );
+}
+
 function render(appRoot) {
+  appRoot.classList.add("tooltip-box");
+
   const validationResult = validateTriangle(sides, lowerBound, upperBound);
 
-  if (!validationResult.isValid) {
-    appRoot.append(
-      renderErrorScreen(
-        validationResult.errorMessages,
-        getHelpText(lowerBound, upperBound)
-      )
-    );
-
-    return;
-  }
-
-  const answer = isTriangle(sides);
-
-  appRoot.append(renderAnswerScreen(getAnswerPhrase(sides, answer), answer));
+  validationResult.isValid
+    ? renderValidResult(appRoot, isTriangle(sides))
+    : renderNonvalidResult(appRoot, validationResult.errorMessages);
 }
+
+const eventProcessor = {
+  counter: 1,
+
+  handleEvent(event) {
+    console.log(`counter: ${this.counter++}`);
+
+    event.preventDefault();
+  },
+};
 
 function main() {
   const appDiv = getApplicationDiv("#app");
 
+  // const a = document.body.querySelector("a");
+  // a.addEventListener("click", eventProcessor);
+
   if (appDiv !== null) {
-    let p = prompt("Введите сторону А");
-
-    console.log(p);
-
     render(appDiv);
   } else {
     console.log("App div not found");
