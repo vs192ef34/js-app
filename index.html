@@ -10,29 +10,38 @@
     <title>Task Manager</title>
   </head>
   <body>
-    <form action="#" name="newTriangle" id="new-triangle">
-      <fieldset name="side1">
-        <input type="text" name="side1name" id="side1name" />
-        <input type="text" name="side1value" id="side1value" />
-      </fieldset>
-
-      <fieldset name="side2">
-        <input type="text" name="side2name" id="side2name" />
-        <input type="text" name="side2value" id="side2value" />
-      </fieldset>
-
-      <fieldset name="side3">
-        <input type="text" name="side3name" id="side3name" />
-        <input type="text" name="side3value" id="side3value" />
-      </fieldset>
-
-      <fieldset name="controls">
-        <input type="button" value="Check" />
-      </fieldset>
-    </form>
-
     <!-- main application block -->
     <div id="app">
+      <form action="#" name="newTriangle" id="new-triangle">
+        <fieldset name="side1">
+          <label for="side1name">Имя стороны:</label>
+          <input type="text" name="side1name" id="side1name" />
+          <label for="side1value">Длина стороны:</label>
+          <input type="text" name="side1value" id="side1value" />
+        </fieldset>
+
+        <fieldset name="side2">
+          <label for="side2name">Имя стороны:</label>
+          <input type="text" name="side2name" id="side2name" />
+          <label for="side2value">Длина стороны:</label>
+          <input type="text" name="side2value" id="side2value" />
+        </fieldset>
+
+        <fieldset name="side3">
+          <label for="side3name">Имя стороны:</label>
+          <input type="text" name="side3name" id="side3name" />
+          <label for="side3value">Длина стороны:</label>
+          <input type="text" name="side3value" id="side3value" />
+        </fieldset>
+
+        <fieldset name="controls">
+          <input type="button" value="Проверить" id="check-button" />
+          <input type="reset" value="Сбросить" />
+        </fieldset>
+      </form>
+
+      <div id="answer-list"></div>
+
       <noscript> Please, turn your JavaScript on. </noscript>
     </div>
 
