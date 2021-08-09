@@ -1,19 +1,14 @@
 import { getApplicationDiv } from "./lib.js";
 
-import { getHelpText, validateTriangle } from "./triangles/validation.js";
-import { isTriangle } from "./triangles/geometry.js";
-import { getAnswerPhrase } from "./triangles/output.js";
+import { createInputForm } from "./components/input-form/input-form.js";
 
-import { range } from "./triangles/util.js";
+import { eventProcessor } from "./processors/event-processor.js";
 
 const defaultSides = [
   { sideName: "a", sideLength: 3000 },
   { sideName: "b", sideLength: 4000 },
   { sideName: "c", sideLength: 5000 },
 ];
-
-const lowerBound = 0;
-const upperBound = 1000;
 
 function renderErrorList(messages) {
   const errorListElement = document.createElement("ul");
@@ -51,21 +46,19 @@ function renderAnswerScreen(answerPhrase) {
   return answerElement;
 }
 
-function renderNonvalidResult(messages) {
+function renderNonvalidResult(messages, helpText) {
   const answerList = document.body.querySelector("#answer-list");
 
   const answerDiv = document.createElement("div");
   answerDiv.classList.add("tooltip-box");
   answerDiv.classList.add("error-box");
 
-  answerDiv.append(
-    renderErrorScreen(messages, getHelpText(lowerBound, upperBound))
-  );
+  answerDiv.append(renderErrorScreen(messages, helpText));
 
   answerList.append(answerDiv);
 }
 
-function renderValidResult(sides, isTriangle) {
+function renderValidResult(sides, isTriangle, answerPhrase) {
   const answerList = document.body.querySelector("#answer-list");
 
   const answerDiv = document.createElement("div");
@@ -74,55 +67,47 @@ function renderValidResult(sides, isTriangle) {
   const boxClassName = isTriangle ? "info-box" : "warning-box";
   answerDiv.classList.add(boxClassName);
 
-  answerDiv.append(renderAnswerScreen(getAnswerPhrase(sides, isTriangle)));
+  answerDiv.append(renderAnswerScreen(answerPhrase));
 
   answerList.append(answerDiv);
 }
 
-const eventProcessor = {
-  getTriangleSide(form, sideNumber) {
-    const fieldSet = form[`side${sideNumber}`];
+function createAnswerList(id) {
+  const answerDiv = document.createElement("div");
+  answerDiv.id = id;
 
-    return {
-      sideName: fieldSet.elements[`side${sideNumber}name`].value,
-      sideLength: parseInt(fieldSet.elements[`side${sideNumber}value`].value),
-    };
-  },
+  return answerDiv;
+}
 
-  checkTriangleHandler(event) {
-    const low = 1;
-    const high = 3;
+function renderAnswer(root, data) {
+  data.validationResult.isValid
+    ? renderValidResult(data.sides, data.isTriangle, data.answerPhrase)
+    : renderNonvalidResult(data.validationResult.errorMessages, data.helpText);
+}
 
-    const sides = range(low, high).map((sideNumber) =>
-      this.getTriangleSide(document.forms.newTriangle, sideNumber)
-    );
+function render(root) {
+  root.innerHTML = "";
 
-    const validationResult = validateTriangle(sides, lowerBound, upperBound);
+  const form = createInputForm("new-triangle");
 
-    validationResult.isValid
-      ? renderValidResult(sides, isTriangle(sides))
-      : renderNonvalidResult(validationResult.errorMessages);
-  },
+  const checkButton = form.querySelector("#check-button");
+  checkButton.addEventListener("click", eventProcessor);
 
-  handleEvent(event) {
-    switch (event.type) {
-      case "click":
-        this.checkTriangleHandler(event);
-        break;
+  const answerList = createAnswerList("answer-list");
 
-      default:
-        break;
-    }
-  },
-};
+  root.append(form);
+  root.append(answerList);
+}
 
 // TODO: query elements only inside app div
 function main() {
   const appDiv = getApplicationDiv("#app");
 
   if (appDiv !== null) {
-    const checkButton = document.body.querySelector("#check-button");
-    checkButton.addEventListener("click", eventProcessor);
+    eventProcessor.root = appDiv;
+    eventProcessor.renderFunction = renderAnswer;
+
+    render(appDiv);
   } else {
     console.log("App div not found");
   }

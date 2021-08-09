@@ -25,3 +25,7 @@
 #template-store {
   display: none;
 }
+
+label:nth-child(3) {
+  padding-left: 10px;
+}
