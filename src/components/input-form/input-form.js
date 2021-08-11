@@ -22,11 +22,12 @@ function createLabel(forName, innerText, className = "") {
   return labelElement;
 }
 
-function createTextInput(name, id, className = "") {
+function createTextInput(name, id, value, className = "") {
   const textInput = document.createElement("input");
   textInput.type = "text";
   textInput.name = name;
   textInput.id = id;
+  textInput.value = value;
   textInput.className = className;
 
   return textInput;
@@ -49,25 +50,29 @@ function createResetButton(title) {
   return controlInput;
 }
 
-function createInput(idName, labelText) {
+function createInput(idName, labelText, value) {
   const fragment = new DocumentFragment();
 
   const inputLabel = createLabel(idName, labelText);
   fragment.append(inputLabel);
 
-  const valueInput = createTextInput(idName, idName);
+  const valueInput = createTextInput(idName, idName, value);
   fragment.append(valueInput);
 
   return fragment;
 }
 
-function createInputFieldset(prefix, nameLabel, valueLabel) {
+function createInputFieldset(prefix, side, nameLabel, valueLabel) {
   const fieldset = createFieldset(prefix);
 
-  const nameInput = createInput(`${prefix}name`, nameLabel);
+  const nameInput = createInput(`${prefix}name`, nameLabel, side?.sideName);
   fieldset.append(nameInput);
 
-  const valueInput = createInput(`${prefix}value`, valueLabel);
+  const valueInput = createInput(
+    `${prefix}value`,
+    valueLabel,
+    side?.sideLength
+  );
   fieldset.append(valueInput);
 
   return fieldset;
@@ -85,14 +90,19 @@ function createControlFieldset(prefix) {
   return fieldset;
 }
 
-function createInputForm(idName) {
+function createInputForm(idName, sides) {
   const nameLabel = "Имя стороны:";
   const valueLabel = "Длина стороны:";
 
   const form = createForm(idName);
 
-  const fieldsets = ["side1", "side2", "side3"].map((prefix) =>
-    createInputFieldset(prefix, nameLabel, valueLabel)
+  const fieldsets = [1, 2, 3].map((prefix) =>
+    createInputFieldset(
+      `side${prefix}`,
+      sides[prefix - 1],
+      nameLabel,
+      valueLabel
+    )
   );
 
   fieldsets.push(createControlFieldset("controls"));

@@ -9,6 +9,11 @@ const eventProcessor = {
   lowerBound: 0,
   upperBound: 1000,
 
+  data: {
+    input: [],
+    answers: [],
+  },
+
   renderFunction: () => {},
 
   processTriangleData(sides, lowerBound, upperBound) {
@@ -49,7 +54,8 @@ const eventProcessor = {
       this.upperBound
     );
 
-    this.renderFunction(this.root, data);
+    this.data.input = sides;
+    this.data.answers = [data, ...this.data.answers];
   },
 
   handleEvent(event) {
@@ -61,6 +67,8 @@ const eventProcessor = {
       default:
         break;
     }
+
+    this.renderFunction(this.root, this.data);
   },
 };
 
