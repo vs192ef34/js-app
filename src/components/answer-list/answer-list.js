@@ -56,15 +56,16 @@ function createValidResultDiv(isTriangle, answerPhrase) {
   return answerDiv;
 }
 
-function createAnswerDivs(root, data) {
+function createAnswerDivs(data) {
   const fragment = new DocumentFragment();
 
-  data.forEach((result) => {
+  const visibleData = data.filter((result) => result.isVisible);
+
+  visibleData.forEach((result) => {
     fragment.append(
       result.validationResult.isValid
         ? createValidResultDiv(result.isTriangle, result.answerPhrase)
         : createNonvalidResultDiv(
-            root,
             result.validationResult.errorMessages,
             result.helpText
           )
@@ -74,46 +75,11 @@ function createAnswerDivs(root, data) {
   return fragment;
 }
 
-function createCheckbox(idName, text) {
-  const checkBox = document.createElement("input");
-  checkBox.type = "checkbox";
-  checkBox.id = idName;
-  checkBox.name = idName;
-
-  const label = document.createElement("label");
-  label.htmlFor = idName;
-  label.innerHTML = text;
-
-  const fragment = new DocumentFragment();
-  fragment.append(checkBox);
-  fragment.append(label);
-
-  return fragment;
-}
-
-function createFilterBlock() {
-  const filterDiv = document.createElement("div");
-
-  const checkboxes = [
-    createCheckbox("non-valid", "Non valid"),
-    createCheckbox("valid-correct", "Triangles"),
-    createCheckbox("valid-incorrect", "Not triangles"),
-  ];
-
-  checkboxes.forEach((ch) => filterDiv.append(ch));
-
-  return filterDiv;
-}
-
 function createAnswerList(id, data) {
   const answerListDiv = document.createElement("div");
   answerListDiv.id = id;
 
-  if (data.length !== 0) {
-    answerListDiv.append(createFilterBlock());
-  }
-
-  answerListDiv.append(createAnswerDivs(answerListDiv, data));
+  answerListDiv.append(createAnswerDivs(data));
 
   return answerListDiv;
 }

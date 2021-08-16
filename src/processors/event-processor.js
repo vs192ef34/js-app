@@ -1,61 +1,32 @@
-import { range } from "../triangles/util.js";
-import { isTriangle } from "../triangles/geometry.js";
-import { getHelpText, validateTriangle } from "../triangles/validation.js";
-import { getAnswerPhrase } from "../triangles/output.js";
+import { getTriangleSides } from "../input/triangle-input.js";
+
+import { state } from "../state/state.js";
 
 const eventProcessor = {
   root: null,
 
-  lowerBound: 0,
-  upperBound: 1000,
-
-  data: {
-    input: [],
-    answers: [],
-  },
-
   renderFunction: () => {},
 
-  processTriangleData(sides, lowerBound, upperBound) {
-    const validationResult = validateTriangle(sides, lowerBound, upperBound);
-
-    return {
-      sides,
-      validationResult,
-      isTriangle: validationResult.isValid ? isTriangle(sides) : false,
-      helpText: getHelpText(this.lowerBound, this.upperBound),
-      answerPhrase: getAnswerPhrase(
-        sides,
-        validationResult.isValid ? isTriangle(sides) : false
-      ),
-    };
-  },
-
-  getTriangleSide(form, sideNumber) {
-    const fieldSet = form[`side${sideNumber}`];
-
-    return {
-      sideName: fieldSet.elements[`side${sideNumber}name`].value,
-      sideLength: parseInt(fieldSet.elements[`side${sideNumber}value`].value),
-    };
-  },
-
   checkTriangleHandler(event) {
-    const low = 1;
-    const high = 3;
+    const sides = getTriangleSides();
 
-    const sides = range(low, high).map((sideNumber) =>
-      this.getTriangleSide(document.forms["new-triangle"], sideNumber)
-    );
+    state.processAndAddTriangle(sides);
+  },
 
-    const data = this.processTriangleData(
-      sides,
-      this.lowerBound,
-      this.upperBound
-    );
-
-    this.data.input = sides;
-    this.data.answers = [data, ...this.data.answers];
+  handleCheckboxes(event) {
+    switch (event.target.id) {
+      case "non-valid":
+        state.answersFilter.nonValid = event.target.checked;
+        break;
+      case "valid-correct":
+        state.answersFilter.validCorrect = event.target.checked;
+        break;
+      case "valid-incorrect":
+        state.answersFilter.validIncorrect = event.target.checked;
+        break;
+      default:
+        break;
+    }
   },
 
   handleEvent(event) {
@@ -64,11 +35,16 @@ const eventProcessor = {
         this.checkTriangleHandler(event);
         break;
 
+      case "change":
+        this.handleCheckboxes(event);
+        break;
+
       default:
         break;
     }
 
-    this.renderFunction(this.root, this.data);
+    state.updateAnswersVisibility();
+    this.renderFunction(this.root, state);
   },
 };
 
