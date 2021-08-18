@@ -1,3 +1,23 @@
+function createEditButton(id) {
+  const button = document.createElement("input");
+  button.type = "button";
+  button.value = "Edit";
+  button.className = "edit-button";
+  button.dataset.answerId = id;
+
+  return button;
+}
+
+function createDeleteButton(id) {
+  const button = document.createElement("input");
+  button.type = "button";
+  button.value = "Delete";
+  button.className = "delete-button";
+  button.dataset.answerId = id;
+
+  return button;
+}
+
 function createErrorList(messages) {
   const errorListElement = document.createElement("ul");
 
@@ -34,17 +54,20 @@ function createAnswerPhrase(answerPhrase) {
   return answerElement;
 }
 
-function createNonvalidResultDiv(messages, helpText) {
+function createNonvalidResultDiv(id, messages, helpText) {
   const answerDiv = document.createElement("div");
   answerDiv.classList.add("tooltip-box");
   answerDiv.classList.add("error-box");
 
   answerDiv.append(createErrorBlock(messages, helpText));
 
+  answerDiv.append(createDeleteButton(id));
+  answerDiv.append(createEditButton(id));
+
   return answerDiv;
 }
 
-function createValidResultDiv(isTriangle, answerPhrase) {
+function createValidResultDiv(id, isTriangle, answerPhrase) {
   const answerDiv = document.createElement("div");
   answerDiv.classList.add("tooltip-box");
 
@@ -52,6 +75,9 @@ function createValidResultDiv(isTriangle, answerPhrase) {
   answerDiv.classList.add(boxClassName);
 
   answerDiv.append(createAnswerPhrase(answerPhrase));
+
+  answerDiv.append(createDeleteButton(id));
+  answerDiv.append(createEditButton(id));
 
   return answerDiv;
 }
@@ -64,8 +90,13 @@ function createAnswerDivs(data) {
   visibleData.forEach((result) => {
     fragment.append(
       result.validationResult.isValid
-        ? createValidResultDiv(result.isTriangle, result.answerPhrase)
+        ? createValidResultDiv(
+            result.id,
+            result.isTriangle,
+            result.answerPhrase
+          )
         : createNonvalidResultDiv(
+            result.id,
             result.validationResult.errorMessages,
             result.helpText
           )

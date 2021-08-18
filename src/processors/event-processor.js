@@ -1,5 +1,3 @@
-import { getTriangleSides } from "../input/triangle-input.js";
-
 import { state } from "../state/state.js";
 
 const eventProcessor = {
@@ -7,44 +5,17 @@ const eventProcessor = {
 
   renderFunction: () => {},
 
-  checkTriangleHandler(event) {
-    const sides = getTriangleSides();
-
-    state.processAndAddTriangle(sides);
-  },
-
-  handleCheckboxes(event) {
-    switch (event.target.id) {
-      case "non-valid":
-        state.answersFilter.nonValid = event.target.checked;
-        break;
-      case "valid-correct":
-        state.answersFilter.validCorrect = event.target.checked;
-        break;
-      case "valid-incorrect":
-        state.answersFilter.validIncorrect = event.target.checked;
-        break;
-      default:
-        break;
-    }
-  },
+  handlersMap: {},
 
   handleEvent(event) {
-    switch (event.type) {
-      case "click":
-        this.checkTriangleHandler(event);
-        break;
+    if (Object.hasOwn(this.handlersMap, event.type)) {
+      const handlers = this.handlersMap[event.type];
+      handlers.forEach((handler) => handler(state, event));
 
-      case "change":
-        this.handleCheckboxes(event);
-        break;
+      state.updateAnswersVisibility();
 
-      default:
-        break;
+      this.renderFunction(this.root, state);
     }
-
-    state.updateAnswersVisibility();
-    this.renderFunction(this.root, state);
   },
 };
 

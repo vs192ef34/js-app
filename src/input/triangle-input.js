@@ -9,7 +9,7 @@ function getTriangleSide(form, sideNumber) {
   };
 }
 
-function getTriangleSides() {
+function getTriangleSides(event) {
   const low = 1;
   const high = 3;
 

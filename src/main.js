@@ -1,5 +1,10 @@
 import { createApplicationDiv } from "./components/application/application.js";
 
+import { checkTriangleHandler } from "./handlers/check-triangle-handler.js";
+import { handleCheckboxes } from "./handlers/handle-checkboxes.js";
+import { deleteResultHandler } from "./handlers/delete-result-handler.js";
+import { editResultHandler } from "./handlers/edit-result-handler.js";
+
 import { eventProcessor } from "./processors/event-processor.js";
 
 const initialData = {
@@ -21,9 +26,17 @@ const initialData = {
   },
 };
 
+const defaultEventHandlers = {
+  click: [checkTriangleHandler, deleteResultHandler, editResultHandler],
+  change: [handleCheckboxes],
+};
+
 function setupEventListeners(root) {
   const checkButton = root.querySelector("#check-button");
   checkButton.addEventListener("click", eventProcessor);
+
+  const answerDiv = root.querySelector("#answer-list");
+  answerDiv.addEventListener("click", eventProcessor);
 
   const nonValidCheckbox = root.querySelector("#non-valid");
   const validCorrectCheckbox = root.querySelector("#valid-correct");
@@ -50,6 +63,7 @@ function main() {
   if (appDiv !== null) {
     eventProcessor.root = appDiv;
     eventProcessor.renderFunction = render;
+    eventProcessor.handlersMap = defaultEventHandlers;
 
     render(appDiv, initialData);
   } else {

@@ -29,3 +29,11 @@
 label:nth-child(3) {
   padding-left: 10px;
 }
+
+.delete-button {
+  border: 1px solid red;
+}
+
+.edit-button {
+  border: 1px solid green;
+}
