@@ -4,15 +4,18 @@ import { checkTriangleHandler } from "./handlers/check-triangle-handler.js";
 import { handleCheckboxes } from "./handlers/handle-checkboxes.js";
 import { deleteResultHandler } from "./handlers/delete-result-handler.js";
 import { editResultHandler } from "./handlers/edit-result-handler.js";
+import { resetEditMode } from "./handlers/reset-edit-mode.js";
 
 import { eventProcessor } from "./processors/event-processor.js";
 
 const initialData = {
+  isEditMode: false,
   input: [
     { sideName: "a", sideLength: 3 },
     { sideName: "b", sideLength: 4 },
     { sideName: "c", sideLength: 5 },
   ],
+  nameValidationResults: [],
   answersFilter: {
     nonValid: true,
     validCorrect: true,
@@ -24,16 +27,24 @@ const initialData = {
   hasAnswers() {
     return this.answers.length > 0;
   },
+  isInEditMode() {
+    return this.isEditMode;
+  },
 };
 
 const defaultEventHandlers = {
-  click: [checkTriangleHandler, deleteResultHandler, editResultHandler],
+  click: [
+    checkTriangleHandler,
+    deleteResultHandler,
+    editResultHandler,
+    resetEditMode,
+  ],
   change: [handleCheckboxes],
 };
 
 function setupEventListeners(root) {
-  const checkButton = root.querySelector("#check-button");
-  checkButton.addEventListener("click", eventProcessor);
+  const fieldset = root.querySelector("#form-controls");
+  fieldset.addEventListener("click", eventProcessor);
 
   const answerDiv = root.querySelector("#answer-list");
   answerDiv.addEventListener("click", eventProcessor);

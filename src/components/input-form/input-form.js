@@ -62,7 +62,13 @@ function createInput(idName, labelText, value) {
   return fragment;
 }
 
-function createInputFieldset(prefix, side, nameLabel, valueLabel) {
+function createInputFieldset(
+  prefix,
+  side,
+  nameLabel,
+  valueLabel,
+  validationResult
+) {
   const fieldset = createFieldset(prefix);
 
   const nameInput = createInput(`${prefix}name`, nameLabel, side?.sideName);
@@ -75,14 +81,28 @@ function createInputFieldset(prefix, side, nameLabel, valueLabel) {
   );
   fieldset.append(valueInput);
 
+  if (!validationResult?.isValid) {
+    const errorDiv = document.createElement("div");
+    errorDiv.innerHTML = validationResult?.messages.join(";");
+
+    fieldset.append(errorDiv);
+  }
+
   return fieldset;
 }
 
-function createControlFieldset(prefix) {
+function createControlFieldset(prefix, isEditMode) {
   const fieldset = createFieldset(prefix);
+
+  fieldset.id = "form-controls";
 
   const checkButton = createButton("check-button", "Проверить");
   fieldset.append(checkButton);
+
+  if (isEditMode) {
+    const resetButton = createButton("reset-button", "Отмена");
+    fieldset.append(resetButton);
+  }
 
   const resetButton = createResetButton("Сбросить");
   fieldset.append(resetButton);
@@ -90,7 +110,7 @@ function createControlFieldset(prefix) {
   return fieldset;
 }
 
-function createInputForm(idName, sides) {
+function createInputForm(idName, sides, isEditMode, state) {
   const nameLabel = "Имя стороны:";
   const valueLabel = "Длина стороны:";
 
@@ -101,11 +121,12 @@ function createInputForm(idName, sides) {
       `side${prefix}`,
       sides[prefix - 1],
       nameLabel,
-      valueLabel
+      valueLabel,
+      state.nameValidationResults[prefix - 1]
     )
   );
 
-  fieldsets.push(createControlFieldset("controls"));
+  fieldsets.push(createControlFieldset("controls", isEditMode));
 
   fieldsets.forEach((fieldset) => form.append(fieldset));
 

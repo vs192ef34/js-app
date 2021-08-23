@@ -2,13 +2,20 @@ import { isTriangle } from "./triangles/geometry.js";
 import { getHelpText, validateTriangle } from "./triangles/validation.js";
 import { getAnswerPhrase } from "./triangles/output.js";
 
+import { validateSideName } from "../input/validators/side-name.js";
+
 let counter = 1;
 
 const state = {
   lowerBound: 0,
   upperBound: 1000,
 
+  isEditMode: false,
+  editedAnswerId: 0,
+
   input: [],
+
+  nameValidationResults: [],
 
   answersFilter: {
     nonValid: true,
@@ -19,6 +26,18 @@ const state = {
   answers: [],
 
   processTriangleData(sides) {
+    this.nameValidationResults = sides.map((side) => {
+      return validateSideName(side.sideName);
+    });
+
+    const nameIsValid = !this.nameValidationResults.some(
+      (result) => result.isValid === false
+    );
+
+    if (!nameIsValid) {
+      return null;
+    }
+
     const validationResult = validateTriangle(
       sides,
       this.lowerBound,
@@ -68,7 +87,28 @@ const state = {
     const triangleData = this.processTriangleData(sides);
 
     this.input = sides;
+
+    if (triangleData === null) return;
+
     this.answers = [triangleData, ...this.answers];
+
+    let position = 1;
+    this.answers.forEach((answer) => (answer.position = position++));
+  },
+
+  processAndUpdateTriangle(sides) {
+    const oldAnswerId = this.editedAnswerId;
+    const triangleData = this.processTriangleData(sides);
+
+    this.input = sides;
+
+    if (triangleData === null) return;
+
+    const oldAnswerIndex = this.answers.findIndex(
+      (answer) => answer.id === oldAnswerId
+    );
+
+    this.answers[oldAnswerIndex] = triangleData;
 
     let position = 1;
     this.answers.forEach((answer) => (answer.position = position++));
@@ -76,6 +116,20 @@ const state = {
 
   hasAnswers() {
     return this.answers.length > 0;
+  },
+
+  setEditMode(answerId) {
+    this.isEditMode = true;
+    this.editedAnswerId = answerId;
+  },
+
+  resetEditMode() {
+    this.isEditMode = false;
+    this.editedAnswerId = 0;
+  },
+
+  isInEditMode() {
+    return this.isEditMode;
   },
 };
 

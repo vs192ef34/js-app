@@ -5,7 +5,13 @@ function checkTriangleHandler(state, event) {
 
   const sides = getTriangleSides(event);
 
-  state.processAndAddTriangle(sides);
+  if (state.isInEditMode()) {
+    state.processAndUpdateTriangle(sides);
+
+    state.resetEditMode();
+  } else {
+    state.processAndAddTriangle(sides);
+  }
 }
 
 export { checkTriangleHandler };

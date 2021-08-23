@@ -1,19 +1,27 @@
-function createEditButton(id) {
+function createEditButton(id, isEditMode) {
   const button = document.createElement("input");
   button.type = "button";
   button.value = "Edit";
   button.className = "edit-button";
   button.dataset.answerId = id;
 
+  if (isEditMode) {
+    button.setAttribute("disabled", "");
+  }
+
   return button;
 }
 
-function createDeleteButton(id) {
+function createDeleteButton(id, isEditMode) {
   const button = document.createElement("input");
   button.type = "button";
   button.value = "Delete";
   button.className = "delete-button";
   button.dataset.answerId = id;
+
+  if (isEditMode) {
+    button.setAttribute("disabled", "");
+  }
 
   return button;
 }
@@ -54,20 +62,20 @@ function createAnswerPhrase(answerPhrase) {
   return answerElement;
 }
 
-function createNonvalidResultDiv(id, messages, helpText) {
+function createNonvalidResultDiv(id, messages, helpText, isEditMode) {
   const answerDiv = document.createElement("div");
   answerDiv.classList.add("tooltip-box");
   answerDiv.classList.add("error-box");
 
   answerDiv.append(createErrorBlock(messages, helpText));
 
-  answerDiv.append(createDeleteButton(id));
-  answerDiv.append(createEditButton(id));
+  answerDiv.append(createDeleteButton(id, isEditMode));
+  answerDiv.append(createEditButton(id, isEditMode));
 
   return answerDiv;
 }
 
-function createValidResultDiv(id, isTriangle, answerPhrase) {
+function createValidResultDiv(id, isTriangle, answerPhrase, isEditMode) {
   const answerDiv = document.createElement("div");
   answerDiv.classList.add("tooltip-box");
 
@@ -76,13 +84,13 @@ function createValidResultDiv(id, isTriangle, answerPhrase) {
 
   answerDiv.append(createAnswerPhrase(answerPhrase));
 
-  answerDiv.append(createDeleteButton(id));
-  answerDiv.append(createEditButton(id));
+  answerDiv.append(createDeleteButton(id, isEditMode));
+  answerDiv.append(createEditButton(id, isEditMode));
 
   return answerDiv;
 }
 
-function createAnswerDivs(data) {
+function createAnswerDivs(data, isEditMode) {
   const fragment = new DocumentFragment();
 
   const visibleData = data.filter((result) => result.isVisible);
@@ -93,12 +101,14 @@ function createAnswerDivs(data) {
         ? createValidResultDiv(
             result.id,
             result.isTriangle,
-            result.answerPhrase
+            result.answerPhrase,
+            isEditMode
           )
         : createNonvalidResultDiv(
             result.id,
             result.validationResult.errorMessages,
-            result.helpText
+            result.helpText,
+            isEditMode
           )
     );
   });
@@ -106,11 +116,11 @@ function createAnswerDivs(data) {
   return fragment;
 }
 
-function createAnswerList(id, data) {
+function createAnswerList(id, state) {
   const answerListDiv = document.createElement("div");
   answerListDiv.id = id;
 
-  answerListDiv.append(createAnswerDivs(data));
+  answerListDiv.append(createAnswerDivs(state.answers, state.isInEditMode()));
 
   return answerListDiv;
 }
