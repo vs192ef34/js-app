@@ -28,4 +28,4 @@ const validateTriangle = (sides, lowerBound, upperBound) => {
   };
 };
 
-export { getHelpText, validateTriangle };
+export { getHelpText, validateSide, validateTriangle };

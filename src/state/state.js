@@ -1,8 +1,10 @@
 import { isTriangle } from "./triangles/geometry.js";
-import { getHelpText, validateTriangle } from "./triangles/validation.js";
+import {
+  getHelpText,
+  validateSide,
+  validateTriangle,
+} from "./triangles/validation.js";
 import { getAnswerPhrase } from "./triangles/output.js";
-
-import { validateSideName } from "../input/validators/side-name.js";
 
 let counter = 1;
 
@@ -16,6 +18,7 @@ const state = {
   input: [],
 
   nameValidationResults: [],
+  lengthValidationResults: [],
 
   answersFilter: {
     nonValid: true,
@@ -26,37 +29,47 @@ const state = {
   answers: [],
 
   processTriangleData(sides) {
-    this.nameValidationResults = sides.map((side) => {
-      return validateSideName(side.sideName);
-    });
-
-    const nameIsValid = !this.nameValidationResults.some(
-      (result) => result.isValid === false
-    );
-
-    if (!nameIsValid) {
-      return null;
-    }
-
     const validationResult = validateTriangle(
       sides,
       this.lowerBound,
       this.upperBound
     );
 
-    return {
-      id: counter++,
-      position: 0,
-      sides,
-      validationResult,
-      isTriangle: validationResult.isValid ? isTriangle(sides) : false,
-      helpText: getHelpText(this.lowerBound, this.upperBound),
-      answerPhrase: getAnswerPhrase(
-        sides,
-        validationResult.isValid ? isTriangle(sides) : false
-      ),
-      isVisible: true,
-    };
+    const businessValidationResults = sides.map((side) => {
+      const result = validateSide(side, this.lowerBound, this.upperBound);
+      return {
+        isValid: result.isValid,
+        messages: [result.errorMessage],
+      };
+    });
+
+    const isValid = !businessValidationResults.some(
+      (sideResult) => sideResult.isValid === false
+    );
+
+    [0, 1, 2].forEach((idx) => {
+      this.lengthValidationResults[idx].isValid =
+        this.lengthValidationResults[idx].isValid &&
+        businessValidationResults[idx].isValid;
+
+      this.lengthValidationResults[idx].messages = [
+        ...this.lengthValidationResults[idx].messages,
+        ...businessValidationResults[idx].messages,
+      ];
+    });
+
+    return isValid
+      ? {
+          id: counter++,
+          position: 0,
+          sides,
+          validationResult,
+          isTriangle: isTriangle(sides),
+          helpText: getHelpText(this.lowerBound, this.upperBound),
+          answerPhrase: getAnswerPhrase(sides, isTriangle(sides)),
+          isVisible: true,
+        }
+      : null;
   },
 
   updateAnswersVisibility() {
@@ -86,8 +99,6 @@ const state = {
   processAndAddTriangle(sides) {
     const triangleData = this.processTriangleData(sides);
 
-    this.input = sides;
-
     if (triangleData === null) return;
 
     this.answers = [triangleData, ...this.answers];
@@ -100,9 +111,7 @@ const state = {
     const oldAnswerId = this.editedAnswerId;
     const triangleData = this.processTriangleData(sides);
 
-    this.input = sides;
-
-    if (triangleData === null) return;
+    if (triangleData === null) return false;
 
     const oldAnswerIndex = this.answers.findIndex(
       (answer) => answer.id === oldAnswerId
@@ -112,6 +121,8 @@ const state = {
 
     let position = 1;
     this.answers.forEach((answer) => (answer.position = position++));
+
+    return true;
   },
 
   hasAnswers() {

@@ -67,7 +67,8 @@ function createInputFieldset(
   side,
   nameLabel,
   valueLabel,
-  validationResult
+  nameValidationResult,
+  lengthValidationResult
 ) {
   const fieldset = createFieldset(prefix);
 
@@ -81,9 +82,16 @@ function createInputFieldset(
   );
   fieldset.append(valueInput);
 
-  if (!validationResult?.isValid) {
+  if (!nameValidationResult?.isValid) {
     const errorDiv = document.createElement("div");
-    errorDiv.innerHTML = validationResult?.messages.join(";");
+    errorDiv.innerHTML = nameValidationResult?.messages.join(";");
+
+    fieldset.append(errorDiv);
+  }
+
+  if (!lengthValidationResult?.isValid) {
+    const errorDiv = document.createElement("div");
+    errorDiv.innerHTML = lengthValidationResult?.messages.join(";");
 
     fieldset.append(errorDiv);
   }
@@ -122,7 +130,8 @@ function createInputForm(idName, sides, isEditMode, state) {
       sides[prefix - 1],
       nameLabel,
       valueLabel,
-      state.nameValidationResults[prefix - 1]
+      state.nameValidationResults[prefix - 1],
+      state.lengthValidationResults[prefix - 1]
     )
   );
 

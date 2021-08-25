@@ -5,17 +5,16 @@ function getTriangleSide(form, sideNumber) {
 
   return {
     sideName: fieldSet.elements[`side${sideNumber}name`].value,
-    sideLength: parseInt(fieldSet.elements[`side${sideNumber}value`].value),
+    sideLength: fieldSet.elements[`side${sideNumber}value`].value,
   };
 }
 
 function getTriangleSides(event) {
-  const low = 1;
-  const high = 3;
-
-  return range(low, high).map((sideNumber) =>
+  const sides = range(1, 3).map((sideNumber) =>
     getTriangleSide(document.forms["new-triangle"], sideNumber)
   );
+
+  return sides;
 }
 
 export { getTriangleSides };

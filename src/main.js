@@ -16,6 +16,7 @@ const initialData = {
     { sideName: "c", sideLength: 5 },
   ],
   nameValidationResults: [],
+  lengthValidationResults: [],
   answersFilter: {
     nonValid: true,
     validCorrect: true,
